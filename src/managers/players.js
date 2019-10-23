@@ -92,15 +92,12 @@ function getPlayer(id) {
             return requestedPlayer;
         }
     }
+    return null;
 }
 
 function generateId() {
-    let highestId = 0;
-    for (var player of players) {
-        if (player.id > highestId) {
-            highestId = player.id;
-        }
-    }
+    let highestId = Math.max.apply(Math, players.map(function(item) {return item.id;}));
+
     highestId++;
     return highestId;
 }

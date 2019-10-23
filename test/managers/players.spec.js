@@ -346,6 +346,19 @@ describe('Players manager', () => {
         assert.equal(getPlayer(1), getPlayer(1));
     })
 
+    it('Will return null because the id doesn\'t exist', function() {
+        var assert = require('assert');
+        players.push({
+            "id": "1",
+            "name": "Messi",
+            "team": "Barcelona",
+            "age": "30",
+            "position": "FW",
+            "country": "Argentina"
+        })
+        assert.equal(getPlayer(2), null);
+    })    
+
     it('Will return a new Id', function() {
         var assert = require('assert');
         players.push({
@@ -358,4 +371,6 @@ describe('Players manager', () => {
         })
         assert.equal(generateId(), 2);
     })
+
+
 })
