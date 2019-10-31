@@ -102,7 +102,6 @@ const addOne = (req, res, next) => {
 const updateOne = (req, res, next) => {
     const { id } = req.params;
     const { name, team, age, position, country } = req.body;
-    PrograWebDB.findOneAndUpdate()
     PrograWebDB.findOneAndUpdate({ id: Number(id)}, { name: name, team: team, age: Number(age), position: position, country: country }, function (err) {
         if (err) {
             res.status(404);
