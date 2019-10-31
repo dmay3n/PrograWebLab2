@@ -61,7 +61,7 @@ const addOne = (req, res, next) => {
                     }
                     else {
                         res.status(201)
-                        res.send('Player with id: ' + id + ' added');
+                        res.send('Player added');
                     }
                 })
             } else {
@@ -86,7 +86,7 @@ const addOne = (req, res, next) => {
                             }
                             else {
                                 res.status(201)
-                                res.send('Player with id: ' + id + ' added');
+                                res.send('Player added');
                             }
                         })
                     }
@@ -102,7 +102,8 @@ const addOne = (req, res, next) => {
 const updateOne = (req, res, next) => {
     const { id } = req.params;
     const { name, team, age, position, country } = req.body;
-    PrograWebDB.findOneAndUpdate({ id: Number(id), name: name, team: team, age: Number(age), position: position, country: country }, function (err) {
+    PrograWebDB.findOneAndUpdate()
+    PrograWebDB.findOneAndUpdate({ id: Number(id)}, { name: name, team: team, age: Number(age), position: position, country: country }, function (err) {
         if (err) {
             res.status(404);
             res.send('There was no player with the id: ' + id);
