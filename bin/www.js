@@ -33,7 +33,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/PrograWebDB');
+mongoose.connect('mongodb://mongodb-server/PrograWebDB');
 
 module.exports = router;
 

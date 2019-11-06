@@ -11,7 +11,7 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 
-mongoose.connect('mongodb://localhost/PrograWebDB');
+mongoose.connect('mongodb://mongodb-server/PrograWebDB');
 app.use(cors())
 
 // view engine setup

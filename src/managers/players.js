@@ -2,7 +2,7 @@
 var PrograWebDB = require('../db/PrograWebDB')
 //var requestedPlayer;
 var redis = require('redis');
-var client = redis.createClient(); //creates a new client
+var client = redis.createClient({host:"redis-server",port:6379}); //creates a new client
 
 client.on('connect', function () {
     console.log('Redis connected');
