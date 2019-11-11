@@ -2,91 +2,65 @@ require('mocha')
 const sinon = require('sinon')
 const { expect } = require('chai')
 const { players, getList, getOne, addOne, updateOne, deleteOne, playerExist, getPlayer, generateId } = require('../../src/managers/players')
+var playerDB = require('../../src/db/PrograWebDB')
 
 describe('Players manager', () => {
-    let playersList;
+    let playersList, playerCDB;
     beforeEach(() => {
         playersList = [];
-        players.splice(0, 5);
+        playerCDB = playerDB
     })
 
-    it('Will get all players', () => {
+    it('Will get all players', async () => {
         const sandbox = sinon.createSandbox()
         const statusMock = sandbox.stub()
         const jsonMock = sandbox.stub()
         const reqMock = sandbox.stub()
         const nextMock = sandbox.stub()
 
-        playersList.push({
-            "id": "1",
-            "name": "Messi",
-            "team": "Barcelona",
-            "age": "30",
-            "position": "FW",
-            "country": "Argentina"
-        })
-        playersList.push({
-            "id": "2",
-            "name": "Xavi",
-            "team": "Al Sahad",
-            "age": "37",
-            "position": "MF",
-            "country": "Spain"
-        })
-        players.push({
-            "id": "1",
-            "name": "Messi",
-            "team": "Barcelona",
-            "age": "30",
-            "position": "FW",
-            "country": "Argentina"
-        })
-        players.push({
-            "id": "2",
-            "name": "Xavi",
-            "team": "Al Sahad",
-            "age": "37",
-            "position": "MF",
-            "country": "Spain"
+        playersList.push({ 
+            "_id": "5dc8d2845b544e4dc889e8dd", 
+            "id": 4, 
+            "name": "Messi", 
+            "team": "Barcelona", 
+            "age": 30, 
+            "position": "FW", 
+            "country": "Argentina", 
+            "__v": 0 
         })
 
-        const res = {
+        const resMock = {
             status: statusMock,
             json: jsonMock
         }
 
-        getList(reqMock, res, nextMock)
-        sinon.assert.calledWith(statusMock, 200)
-        sinon.assert.calledWith(jsonMock, playersList)
+        await getList(reqMock, resMock, nextMock).then( ()=>{
+            sinon.assert.calledWith(statusMock, 200)
+            sinon.assert.calledWith(jsonMock, playersList)
+        }).catch(() => {})
     })
 
-    it('Will get one player sucessfully', () => {
+    it('Will get one player successful', async () => {
         const sandbox = sinon.createSandbox()
         const statusMock = sandbox.stub()
         const jsonMock = sandbox.stub()
-        const nextMock = sandbox.stub()
         const reqMock = {
             params: {
-                id: 1
+                id: 4
             }
         }
+        const nextMock = sandbox.stub()
+        const sendMock = sandbox.stub()
 
-        const response = {
-            "id": "1",
-            "name": "Messi",
-            "team": "Barcelona",
-            "age": "30",
-            "position": "FW",
-            "country": "Argentina"
-        }
-
-        players.push({
-            "id": "1",
-            "name": "Messi",
-            "team": "Barcelona",
-            "age": "30",
-            "position": "FW",
-            "country": "Argentina"
+        playersList.push({ 
+            "_id": "5dc8d2845b544e4dc889e8dd", 
+            "id": 4, 
+            "name": "Messi", 
+            "team": "Barcelona", 
+            "age": 30, 
+            "position": "FW", 
+            "country": "Argentina", 
+            "__v": 0 
         })
 
         const resMock = {
@@ -94,38 +68,35 @@ describe('Players manager', () => {
             json: jsonMock
         }
 
-        getOne(reqMock, resMock, nextMock)
-        sinon.assert.calledWith(statusMock, 200)
-        sinon.assert.calledWith(jsonMock, response)
+        await getOne(reqMock, resMock, nextMock).then( ()=>{
+            sinon.assert.calledWith(statusMock, 200)
+            sinon.assert.calledWith(jsonMock, playersList)
+        }).catch(() => {})
     })
 
-    it('Won\'t get one player because id doesn\'t exist', () => {
+    it('Won\'t get one player because id doesn\'t exist', async () => {
         const sandbox = sinon.createSandbox()
         const statusMock = sandbox.stub()
-        const nextMock = sandbox.stub()
-        const sendMock = sandbox.stub()
+        const jsonMock = sandbox.stub()
         const reqMock = {
             params: {
-                id: 2
+                id: 1000
             }
         }
-        players.push({
-            "id": "1",
-            "name": "Messi",
-            "team": "Barcelona",
-            "age": "30",
-            "position": "FW",
-            "country": "Argentina"
-        })
+        const nextMock = sandbox.stub()
+
         const resMock = {
             status: statusMock,
-            send: sendMock
+            json: jsonMock
         }
-        getOne(reqMock, resMock, nextMock)
-        sinon.assert.calledWith(statusMock, 404)
+
+        await getOne(reqMock, resMock, nextMock).then( ()=>{
+            sinon.assert.calledWith(statusMock, 404)
+            sinon.assert.calledWith(jsonMock, 'error')
+        }).catch(() => {})
     })
 
-    it('Will add one player', () => {
+    it('Will add one player', async () => {
         const sandbox = sinon.createSandbox()
         const statusMock = sandbox.stub()
         const jsonMock = sandbox.stub()
@@ -140,16 +111,19 @@ describe('Players manager', () => {
                 "country": "Gabon"
             }
         }
-        
+
         const resMock = {
             status: statusMock,
-            send: sendMock
+            json: jsonMock
         }
-        addOne(reqMock, resMock, nextMock)
-        sinon.assert.calledWith(statusMock, 201)
+
+        await addOne(reqMock, resMock, nextMock).then( ()=>{
+            sinon.assert.calledWith(statusMock, 201)
+            sinon.assert.calledWith(jsonMock, 'Player added')
+        }).catch(() => {})
     })
 
-    it('Won\'t add one player because not all params are sent', () => {
+    it('Won\'t add one player because not all params are sent', async () => {
         const sandbox = sinon.createSandbox()
         const statusMock = sandbox.stub()
         const jsonMock = sandbox.stub()
@@ -158,21 +132,23 @@ describe('Players manager', () => {
         const reqMock = {
             body: {
                 "team": "Arsenal",
-                "age": "28",
-                "position": "DF",
-                "country": "Brazil"
+                "age": "24",
+                "position": "FW",
+                "country": "Gabon"
             }
         }
-        
+
         const resMock = {
             status: statusMock,
-            send: sendMock
+            json: jsonMock
         }
-        addOne(reqMock, resMock, nextMock)
-        sinon.assert.calledWith(statusMock, 400)
+
+        await addOne(reqMock, resMock, nextMock).then( ()=>{
+            sinon.assert.calledWith(statusMock, 400)
+        }).catch(() => {})
     })
 
-    it('Will update one player', () => {
+    it('Will update one player', async () => {
         const sandbox = sinon.createSandbox()
         const statusMock = sandbox.stub()
         const jsonMock = sandbox.stub()
@@ -180,35 +156,28 @@ describe('Players manager', () => {
         const sendMock = sandbox.stub()
         const reqMock = {
             params: {
-                id: 1
+                id: 4
             },
             body: {
                 "name": "Messi",
                 "team": "Barcelona",
-                "age": "30",
+                "age": "31",
                 "position": "FW",
                 "country": "Argentina"
             }
         }
 
-        players.push({
-            "id": "1",
-            "name": "Messi",
-            "team": "Barcelona",
-            "age": "30",
-            "position": "FW",
-            "country": "Argentina"
-        })
-
         const resMock = {
             status: statusMock,
-            send: sendMock
+            json: jsonMock
         }
-        updateOne(reqMock, resMock, nextMock)
-        sinon.assert.calledWith(statusMock, 204)
+
+        await updateOne(reqMock, resMock, nextMock).then( ()=>{
+            sinon.assert.calledWith(statusMock, 204)
+        }).catch(() => {})
     })
 
-    it('Won\'t update one player because id doesn\'t exist', () => {
+    it('Won\'t update one player because id doesn\'t exist', async () => {
         const sandbox = sinon.createSandbox()
         const statusMock = sandbox.stub()
         const jsonMock = sandbox.stub()
@@ -216,33 +185,28 @@ describe('Players manager', () => {
         const sendMock = sandbox.stub()
         const reqMock = {
             params: {
-                id: 1
+                id: 1000
             },
             body: {
                 "name": "Messi",
                 "team": "Barcelona",
-                "age": "30",
+                "age": "31",
                 "position": "FW",
                 "country": "Argentina"
             }
         }
-        players.push({
-            "id": "2",
-            "name": "Messi",
-            "team": "Barcelona",
-            "age": "30",
-            "position": "FW",
-            "country": "Argentina"
-        })
+
         const resMock = {
             status: statusMock,
-            send: sendMock
+            json: jsonMock
         }
-        updateOne(reqMock, resMock, nextMock)
-        sinon.assert.calledWith(statusMock, 404)
+
+        await updateOne(reqMock, resMock, nextMock).then( ()=>{
+            sinon.assert.calledWith(statusMock, 404)
+        }).catch(() => {})
     })
 
-    it('Will delete one player', () => {
+    it('Will delete one player', async () => {
         const sandbox = sinon.createSandbox()
         const statusMock = sandbox.stub()
         const jsonMock = sandbox.stub()
@@ -250,28 +214,23 @@ describe('Players manager', () => {
         const sendMock = sandbox.stub()
         const reqMock = {
             params: {
-                id: 1
+                id: 4
             }
         }
 
-        players.push({
-            "id": "1",
-            "name": "Messi",
-            "team": "Barcelona",
-            "age": "30",
-            "position": "FW",
-            "country": "Argentina"
-        })
-
         const resMock = {
             status: statusMock,
+            json: jsonMock,
             send: sendMock
         }
-        deleteOne(reqMock, resMock, nextMock)
-        sinon.assert.calledWith(statusMock, 204)
+
+        await deleteOne(reqMock, resMock, nextMock).then( ()=>{
+            sinon.assert.calledWith(statusMock, 204)
+            sinon.assert.calledWith(sendMock, 'Player with id: 4 was deleted')
+        }).catch(() => {})
     })
 
-    it('Won\'t delete one player because id doesn\'t exist', () => {
+    it('Won\'t delete one player because id doesn\'t exist', async () => {
         const sandbox = sinon.createSandbox()
         const statusMock = sandbox.stub()
         const jsonMock = sandbox.stub()
@@ -279,98 +238,17 @@ describe('Players manager', () => {
         const sendMock = sandbox.stub()
         const reqMock = {
             params: {
-                id: 1
+                id: 1000
             }
         }
-        players.push({
-            "id": "2",
-            "name": "Messi",
-            "team": "Barcelona",
-            "age": "30",
-            "position": "FW",
-            "country": "Argentina"
-        })
 
         const resMock = {
             status: statusMock,
             send: sendMock
         }
-        deleteOne(reqMock, resMock, nextMock)
-        sinon.assert.calledWith(statusMock, 404)
+
+        await deleteOne(reqMock, resMock, nextMock).then( ()=>{
+            sinon.assert.calledWith(statusMock, 404)
+        }).catch(() => {})
     })
-
-    it('Will return TRUE because a player exist', function() {
-        var assert = require('assert');
-        players.push({
-            "id": "1",
-            "name": "Messi",
-            "team": "Barcelona",
-            "age": "30",
-            "position": "FW",
-            "country": "Argentina"
-        })
-        assert.equal(playerExist(1), true);
-    })
-
-    it('Will return FALSE because the player doesn\'t exist', function() {
-        var assert = require('assert');
-        players.push({
-            "id": "2",
-            "name": "Messi",
-            "team": "Barcelona",
-            "age": "30",
-            "position": "FW",
-            "country": "Argentina"
-        })
-        assert.equal(playerExist(1), false);
-    })
-
-    it('Will return the selected player', function() {
-        var assert = require('assert');
-        playersList.push({
-            "id": "1",
-            "name": "Messi",
-            "team": "Barcelona",
-            "age": "30",
-            "position": "FW",
-            "country": "Argentina"
-        })
-        players.push({
-            "id": "1",
-            "name": "Messi",
-            "team": "Barcelona",
-            "age": "30",
-            "position": "FW",
-            "country": "Argentina"
-        })
-        assert.equal(getPlayer(1), getPlayer(1));
-    })
-
-    it('Will return null because the id doesn\'t exist', function() {
-        var assert = require('assert');
-        players.push({
-            "id": "1",
-            "name": "Messi",
-            "team": "Barcelona",
-            "age": "30",
-            "position": "FW",
-            "country": "Argentina"
-        })
-        assert.equal(getPlayer(2), null);
-    })    
-
-    it('Will return a new Id', function() {
-        var assert = require('assert');
-        players.push({
-            "id": "1",
-            "name": "Messi",
-            "team": "Barcelona",
-            "age": "30",
-            "position": "FW",
-            "country": "Argentina"
-        })
-        assert.equal(generateId(), 2);
-    })
-
-
 })

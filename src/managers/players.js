@@ -2,7 +2,7 @@
 var PrograWebDB = require('../db/PrograWebDB')
 var requestedPlayer;
 
-const getList = (req, res, next) => {
+const getList = async (req, res, next) => {
     // return all players and code 200
     PrograWebDB.find({}, (err, players) => {
         if (err) {
@@ -16,7 +16,7 @@ const getList = (req, res, next) => {
     })
 }
 
-const getOne = (req, res, next) => {
+const getOne = async (req, res, next) => {
     const { id } = req.params;
     PrograWebDB.findOne({ id: Number(req.params.id) }, (err, player) => {
         if (err) {
@@ -36,18 +36,19 @@ const getOne = (req, res, next) => {
     })
 }
 
-const addOne = (req, res, next) => {
+const addOne = async (req, res, next) => {
     const { name, team, age, position, country } = req.body;
-    //console.log(name + team + age + position + country);
+    var newPlayer, newId;
     if (name && team && age && position && country) {
-        PrograWebDB.find({}, (err, player) => {
+        PrograWebDB.findOne({}).sort({ id: -1 }).limit(1).exec((err, player) => {
             if (err) {
+                //500
                 res.status(500)
                 res.send('error')
-            } else if (player.length == 0) {
-                var index = 1
-                var newPlayer = PrograWebDB({
-                    id: index,
+            } else {
+                newId = (player == null) ? 1 : (player.id + 1)
+                newPlayer = PrograWebDB({
+                    id: newId,
                     name: name,
                     team: team,
                     age: Number(age),
@@ -64,33 +65,6 @@ const addOne = (req, res, next) => {
                         res.send('Player added');
                     }
                 })
-            } else {
-                PrograWebDB.findOne({}).sort({ id: -1 }).limit(1).exec((err, player) => {
-                    if (err) {
-                        res.status(404)
-                        res.send('error')
-                    } else {
-                        var index = player.id + 1
-                        var newPlayer = PrograWebDB({
-                            id: index,
-                            name: name,
-                            team: team,
-                            age: Number(age),
-                            position: position,
-                            country: country
-                        })
-                        newPlayer.save((err) => {
-                            if (err) {
-                                res.status(404)
-                                res.send('error')
-                            }
-                            else {
-                                res.status(201)
-                                res.send('Player added');
-                            }
-                        })
-                    }
-                })
             }
         })
     } else {
@@ -99,10 +73,10 @@ const addOne = (req, res, next) => {
     }
 }
 
-const updateOne = (req, res, next) => {
+const updateOne = async (req, res, next) => {
     const { id } = req.params;
     const { name, team, age, position, country } = req.body;
-    PrograWebDB.findOneAndUpdate({ id: Number(id)}, { name: name, team: team, age: Number(age), position: position, country: country }, function (err) {
+    PrograWebDB.findOneAndUpdate({ id: Number(id) }, { name: name, team: team, age: Number(age), position: position, country: country }, function (err) {
         if (err) {
             res.status(404);
             res.send('There was no player with the id: ' + id);
@@ -114,7 +88,7 @@ const updateOne = (req, res, next) => {
     })
 }
 
-const deleteOne = (req, res, next) => {
+const deleteOne = async (req, res, next) => {
     const { id } = req.params;
     PrograWebDB.findOneAndRemove({ id: Number(id) }, function (err) {
         if (err) {
