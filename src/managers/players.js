@@ -1,15 +1,13 @@
-//const players = require('../routes/players.json');
 var PrograWebDB = require('../db/PrograWebDB')
-//var requestedPlayer;
 var redis = require('redis');
-var client = redis.createClient({host:"redis-server",port:6379}); //creates a new client
+//var client = redis.createClient({ host: "redis-server", port: 6379 }); //creates a new client
+var client = redis.createClient();
 
 client.on('connect', function () {
     console.log('Redis connected');
 });
 
 const getList = async (req, res, next) => {
-    // return all players and code 200
     client.exists('players', function (err, reply) {
         if (reply === 1) {
             client.get('players', function (err, reply) {
@@ -55,74 +53,40 @@ const getOne = (req, res, next) => {
 
 const addOne = (req, res, next) => {
     const { name, team, age, position, country } = req.body;
-    //console.log(name + team + age + position + country);
     if (name && team && age && position && country) {
-        PrograWebDB.find({}, (err, player) => {
+        PrograWebDB.findOne({}).sort({ id: -1 }).limit(1).exec((err, player) => {
             if (err) {
                 res.status(500)
                 res.send('error')
-            } else if (player.length == 0) {
-                var index = 1
-                var newPlayer = PrograWebDB({
-                    id: index,
-                    name: name,
-                    team: team,
-                    age: Number(age),
-                    position: position,
-                    country: country
-                })
-                newPlayer.save((err) => {
-                    if (err) {
-                        res.status(404)
-                        res.send('error')
-                    }
-                    else {
-                        client.exists('players', function(err, reply) {
-                            if (reply === 1) {
-                                client.del('players', function(err, reply) {
-                                    console.log('cache deleted')
-                                });
-                            }
-                        });
-                        res.status(201)
-                        res.send('Player added');
-                    }
-                })
-            } else {
-                PrograWebDB.findOne({}).sort({ id: -1 }).limit(1).exec((err, player) => {
-                    if (err) {
-                        res.status(404)
-                        res.send('error')
-                    } else {
-                        var index = player.id + 1
-                        var newPlayer = PrograWebDB({
-                            id: index,
-                            name: name,
-                            team: team,
-                            age: Number(age),
-                            position: position,
-                            country: country
-                        })
-                        newPlayer.save((err) => {
-                            if (err) {
-                                res.status(404)
-                                res.send('error')
-                            }
-                            else {
-                                client.exists('players', function(err, reply) {
-                                    if (reply === 1) {
-                                        client.del('players', function(err, reply) {
-                                            console.log('cache deleted')
-                                        });
-                                    }
-                                });
-                                res.status(201)
-                                res.send('Player added');
-                            }
-                        })
-                    }
-                })
             }
+
+            var newId = (player == null) ? 1 : player.id + 1
+            var newPlayer = PrograWebDB({
+                id: newId,
+                name: name,
+                team: team,
+                age: Number(age),
+                position: position,
+                country: country
+            })
+
+            newPlayer.save((err) => {
+                if (err) {
+                    res.status(404)
+                    res.send('error')
+                }
+                else {
+                    client.exists('players', function (err, reply) {
+                        if (reply === 1) {
+                            client.del('players', function (err, reply) {
+                                console.log('cache deleted')
+                            });
+                        }
+                    });
+                    res.status(201)
+                    res.send('Player added');
+                }
+            })
         })
     } else {
         res.status(400);
@@ -139,9 +103,9 @@ const updateOne = (req, res, next) => {
             res.send('There was no player with the id: ' + id);
         }
         else {
-            client.exists('players', function(err, reply) {
+            client.exists('players', function (err, reply) {
                 if (reply === 1) {
-                    client.del('players', function(err, reply) {
+                    client.del('players', function (err, reply) {
                         console.log('cache deleted')
                     });
                 }
@@ -160,9 +124,9 @@ const deleteOne = (req, res, next) => {
             res.send('There was no player with the id: ' + id);
         }
         else {
-            client.exists('players', function(err, reply) {
+            client.exists('players', function (err, reply) {
                 if (reply === 1) {
-                    client.del('players', function(err, reply) {
+                    client.del('players', function (err, reply) {
                         console.log('cache deleted')
                     });
                 }
