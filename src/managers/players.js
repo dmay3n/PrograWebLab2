@@ -1,6 +1,8 @@
 var PrograWebDB = require('../db/PrograWebDB')
 var redis = require('redis');
-var client = redis.createClient({ host: "redismayen.westus.azurecontainer.io", port: 6379 }); //creates a new client
+var config = require('config')
+const redisConfig = config.get('redis.redisConfig')
+var client = redis.createClient({ host: redisConfig.host, port: 6379 }); //creates a new client
 var redisON
 
 client.on('connect', function () {

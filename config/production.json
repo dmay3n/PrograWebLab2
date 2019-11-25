@@ -7,7 +7,7 @@
         }
     },
     "redis": {
-        "dbConfig": {
+        "redisConfig": {
             "host": "redismayen.westus.azurecontainer.io",
             "port": 6379
         }

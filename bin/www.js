@@ -8,8 +8,16 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var mongoose = require('mongoose');
+var config = require('config')
+const dbConfig = config.get('mongodb.dbConfig')
 
-mongoose.connect('mongodb://mongodb.westus.azurecontainer.io/PrograWebDB');
+mongoose.connect('mongodb://' + dbConfig.host + '/PrograWebDB', function(err, db){
+  if(err){
+    console.log('can\'t connect to DB')
+  }else{
+    console.log('DB connected')
+  }
+});
 
 module.exports = router;
 
