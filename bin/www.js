@@ -9,8 +9,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var mongoose = require('mongoose');
 
-//mongoose.connect('mongodb://mongodb-server/PrograWebDB');
-mongoose.connect('mongodb://localhost/PrograWebDB');
+mongoose.connect('mongodb://mongodb.westus.azurecontainer.io/PrograWebDB');
 
 module.exports = router;
 

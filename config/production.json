@@ -1,0 +1,15 @@
+{
+    "mongodb": {
+        "dbConfig": {
+            "host": "mongodb.westus.azurecontainer.io",
+            "port": 27017,
+            "dbName": "PrograWebDB"
+        }
+    },
+    "redis": {
+        "dbConfig": {
+            "host": "redismayen.westus.azurecontainer.io",
+            "port": 6379
+        }
+    }
+}
